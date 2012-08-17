@@ -19,9 +19,9 @@ exports.distanceBearing = function (params, features) {
 			print(p);
 			print(" - distance: " + distance);
 			print(" - bearing: " + bearing);
-			
+			print(" - id: " + f.id);
 			//If the feature is inside the radius, add it to the jsonObject
-			jsonObject.push({endPoint: {x: p.x, y: p.y}, distance: distance, bearing: bearing});
+			jsonObject.push({endPoint: {x: p.x, y: p.y}, distance: distance, bearing: bearing, fid: f.id });
 			featureCount++;
 		}
 	});
