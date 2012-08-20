@@ -177,7 +177,7 @@ exports.wps = function (req) {
 	}
 	
 	var params = parseParameters(req);
-	params.wfs = 'http://geoserver.rogue.lmnsolutions.com/geoserver/wfs';
+	params.wfs = 'http://localhost:8080/geoserver/wfs';
 	params.typeName = "medford:schools";
 	return executeWps(params);
  };
@@ -188,7 +188,7 @@ exports.medfordhospitals = function (req) {
 	}
 	
 	var params = parseParameters(req);
-	params.wfs = 'http://geoserver.rogue.lmnsolutions.com/geoserver/wfs';
+	params.wfs = 'http://localhost:8080/geoserver/wfs';
 	params.typeName = "medford:hospitals";
 	return executeWps(params);
 };

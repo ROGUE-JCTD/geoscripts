@@ -15,6 +15,11 @@ exports.distanceBearing = function (params, features) {
 		var distance = calc.getOrthodromicDistance();
 		var bearing = calc.getAzimuth();
 		
+        if(bearing < 0)
+            bearing = 360 + bearing;
+            
+        bearing = Math.round(bearing);
+        
 		if (distance <= params.radius) {
 			print(p);
 			print(" - distance: " + distance);
