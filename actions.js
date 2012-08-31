@@ -4,6 +4,7 @@ var utils = require('ringo/utils/http');
 var httpclient = require('ringo/httpclient');
 var gs = require('./lib/geoscript');
 var db = require('./scripts/DistanceBearing');
+var vt = require('./scripts/Validate');
 
 // character codes used for slicing and decoding
 var SPACE     = " ".charCodeAt(0);
@@ -128,6 +129,42 @@ function executeWps(params) {
     return resp;
 } 
 
+function executeValidation(params) {
+    if (params && params.wfs && params.geom && params.typeName && params.bounds) {
+
+	    var resp = null;
+	    
+        var requestParams = "?request=GetFeature&version=1.0.0&typeName=" + params.typeName + "&BBOX=" + 
+            params.bounds + ",EPSG:4326&outputFormat=JSON";
+
+		var exchange = httpclient.get(params.wfs + requestParams);
+        
+	    var obj = JSON.parse(exchange.content);
+	    if (obj.type != "FeatureCollection") {
+	        throw new Error("Invalid GeoJSON type - " + obj.type);
+	    }
+	    
+	    obj.features.forEach(function(f) {
+	    	f.geometry = gs.geom.create(f.geometry);
+	    });
+	    
+	    resp = response.json(vt.validateIntersect(params, obj.features));
+	} else {
+		print("Server Error: Invalid parameters");
+		resp = {
+	        status: 500,
+	        headers: {"Content-Type": "text/plain",
+	        	"Access-Control-Allow-Origin": "*",
+	        	"Access-Control-Allow-Methods": "POST, GET",
+	        	"Access-Control-Allow-Headers": "x-requested-with,Content-Type"},
+	        body: ["Invalid parameters"]
+	    };
+	}
+
+    resp.headers['Access-Control-Allow-Origin'] = '*';
+    return resp;
+}
+
 function parseParameters(req) {
 	var input = req.input.read();
 	var params = null;
@@ -177,8 +214,9 @@ exports.wps = function (req) {
 	}
 	
 	var params = parseParameters(req);
-	params.wfs = 'http://geoserver.rogue.lmnsolutions.com/geoserver/wfs';
-	params.typeName = "medford:schools";
+	params.wfs = 'http://localhost:8080/geoserver/wfs';
+	//params.typeName = "medford:schools";
+    params.typeName = "earth:chile_schools";
 	return executeWps(params);
  };
 
@@ -188,7 +226,18 @@ exports.medfordhospitals = function (req) {
 	}
 	
 	var params = parseParameters(req);
-	params.wfs = 'http://geoserver.rogue.lmnsolutions.com/geoserver/wfs';
-	params.typeName = "medford:hospitals";
-	return executeWps(params);
+	params.wfs = 'http://localhost:8080/geoserver/wfs';
+	//params.typeName = "medford:hospitals";
+	params.typeName = "earth:chile_health_care";
+    return executeWps(params);
 };
+
+exports.validate = function (req) {
+    if(req.method === "OPTIONS") {
+        return generateOptionsResponse();
+    }
+    
+    var params = parseParameters(req);
+    params.wfs = 'http://localhost:8080/geoserver/wfs';
+    return executeValidation(params);
+}
