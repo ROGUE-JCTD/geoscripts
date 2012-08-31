@@ -27,6 +27,8 @@ var CR = "\r".charCodeAt(0);
 var CRLF = new ByteString("\r\n", "ASCII");
 var EMPTY_LINE = new ByteString("\r\n\r\n", "ASCII");
 
+var wfsAddress = "http://localhost:8080/geoserver/wfs";
+
 exports.index = function (req) {
     var template = getResource("./templates/index.html").content;
     return response.html(
@@ -92,7 +94,7 @@ function convertHexDigit(byte) {
 
 
 function executeWps(params) {
-	if (params && params.x && params.y && params.radius && params.wfs && params.typeName) {
+	if (params && params.x && params.y && params.radius /*&& params.wfs*/ && params.typeName) {
 
 	    var resp = null;
 		
@@ -101,7 +103,7 @@ function executeWps(params) {
 		var requestParams = "?request=GetFeature&version=1.0.0&typeName=" + params.typeName + "&BBOX=" +
 			bbox.lowerleft.x + "," + bbox.lowerleft.y + "," + bbox.upperright.x + "," + bbox.upperright.y + ",EPSG:4326&outputFormat=JSON";
 
-		var exchange = httpclient.get(params.wfs + requestParams);
+		var exchange = httpclient.get(/*params.wfs*/ wfsAddress + requestParams);
 
 	    var obj = JSON.parse(exchange.content);
 	    if (obj.type != "FeatureCollection") {
@@ -130,14 +132,14 @@ function executeWps(params) {
 } 
 
 function executeValidation(params) {
-    if (params && params.wfs && params.geom && params.typeName && params.bounds) {
+    if (params /*&& params.wfs*/ && params.geom && params.typeName && params.bounds) {
 
 	    var resp = null;
 	    
         var requestParams = "?request=GetFeature&version=1.0.0&typeName=" + params.typeName + "&BBOX=" + 
             params.bounds + ",EPSG:4326&outputFormat=JSON";
 
-		var exchange = httpclient.get(params.wfs + requestParams);
+		var exchange = httpclient.get(/*params.wfs*/ wfsAddress + requestParams);
         
 	    var obj = JSON.parse(exchange.content);
 	    if (obj.type != "FeatureCollection") {
@@ -214,7 +216,7 @@ exports.wps = function (req) {
 	}
 	
 	var params = parseParameters(req);
-	params.wfs = 'http://localhost:8080/geoserver/wfs';
+	//params.wfs = 'http://localhost:8080/geoserver/wfs';
 	//params.typeName = "medford:schools";
     params.typeName = "earth:chile_schools";
 	return executeWps(params);
@@ -226,7 +228,7 @@ exports.medfordhospitals = function (req) {
 	}
 	
 	var params = parseParameters(req);
-	params.wfs = 'http://localhost:8080/geoserver/wfs';
+	//params.wfs = 'http://localhost:8080/geoserver/wfs';
 	//params.typeName = "medford:hospitals";
 	params.typeName = "earth:chile_health_care";
     return executeWps(params);
@@ -238,6 +240,6 @@ exports.validate = function (req) {
     }
     
     var params = parseParameters(req);
-    params.wfs = 'http://localhost:8080/geoserver/wfs';
+   // params.wfs = 'http://localhost:8080/geoserver/wfs';
     return executeValidation(params);
 }
