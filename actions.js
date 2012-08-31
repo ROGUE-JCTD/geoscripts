@@ -27,7 +27,7 @@ var CR = "\r".charCodeAt(0);
 var CRLF = new ByteString("\r\n", "ASCII");
 var EMPTY_LINE = new ByteString("\r\n\r\n", "ASCII");
 
-var wfsAddress = "http://localhost:8080/geoserver/wfs";
+var wfsAddress = "http://192.168.10.126/geoserver/wfs";
 
 exports.index = function (req) {
     var template = getResource("./templates/index.html").content;
