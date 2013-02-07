@@ -27,7 +27,7 @@ var CR = "\r".charCodeAt(0);
 var CRLF = new ByteString("\r\n", "ASCII");
 var EMPTY_LINE = new ByteString("\r\n\r\n", "ASCII");
 
-var wfsAddress = "http://192.168.10.126/geoserver/wfs";
+var wfsAddress = "http://192.168.10.173/geoserver/wfs";
 
 exports.index = function (req) {
     var template = getResource("./templates/index.html").content;
@@ -101,7 +101,7 @@ function executeWps(params) {
 		var bbox = makeBBox(params.x, params.y, params.radius);
 
 		var requestParams = "?request=GetFeature&version=1.0.0&typeName=" + params.typeName + "&BBOX=" +
-			bbox.lowerleft.x + "," + bbox.lowerleft.y + "," + bbox.upperright.x + "," + bbox.upperright.y + ",EPSG:4326&outputFormat=JSON";
+			bbox.lowerleft.x + "," + bbox.lowerleft.y + "," + bbox.upperright.x + "," + bbox.upperright.y + ",EPSG:900913&outputFormat=JSON";
 
 		var exchange = httpclient.get(/*params.wfs*/ wfsAddress + requestParams);
 
@@ -210,7 +210,7 @@ exports.wps = function (req) {
 	return executeWps(params);
  };
 
- exports.medfordschools = function (req) {
+ exports.pointhazzard = function (req) {
 	if(req.method === "OPTIONS") {
 		return generateOptionsResponse();
 	}
@@ -218,11 +218,11 @@ exports.wps = function (req) {
 	var params = parseParameters(req);
 	//params.wfs = 'http://localhost:8080/geoserver/wfs';
 	//params.typeName = "medford:schools";
-    params.typeName = "earth:chile_schools";
+    params.typeName = "lmn_demo:point_hazzard";
 	return executeWps(params);
  };
 
-exports.medfordhospitals = function (req) {
+exports.pointhospitals = function (req) {
 	if(req.method === "OPTIONS") {
 		return generateOptionsResponse();
 	}
@@ -230,7 +230,7 @@ exports.medfordhospitals = function (req) {
 	var params = parseParameters(req);
 	//params.wfs = 'http://localhost:8080/geoserver/wfs';
 	//params.typeName = "medford:hospitals";
-	params.typeName = "earth:chile_health_care";
+	params.typeName = "lmn_demo:point_hospital";
     return executeWps(params);
 };
 
